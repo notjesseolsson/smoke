@@ -1,11 +1,47 @@
 $(function() {
   var canvas = $('canvas')[0]
   var things = []
+  var rgbColor = 'rgb(0,0,0)'
+
   var cursor = new Image()
   cursor.src = 'cursor.png'
+  var colorWheel = new Image()
+
+  $(colorWheel).on('load', function() {
+    var colorWheelContext = $('.color-wheel')[0].getContext('2d')
+    colorWheelContext.drawImage(colorWheel, 0, 0, 150, 150)
+    $('.color-wheel').on('click', getRgb)
+    $('.color-wheel').on('mousemove', function(e) {
+      if (mousedown) {
+        getRgb(e)
+      }
+    })
+
+    function getRgb(e) {
+      var x = e.pageX - $('.color-wheel').offset().left
+      var y = e.pageY - $('.color-wheel').offset().top
+      var rgb = colorWheelContext.getImageData(x, y, 1, 1).data
+      rgbColor = 'rgb('+rgb[0]+','+rgb[1]+','+rgb[2]+')'
+      $('.color').css('background-color', rgbColor)
+    }
+  })
+
+  colorWheel.src = 'color-wheel.png'
+  var b2w = new Image()
+
+  $(b2w).on('load', function() {
+    var b2wContext = $('.b2w')[0].getContext('2d')
+    b2wContext.drawImage(b2w, 0, 0)
+  })
+
+  b2w.src = 'b2w.png'
+
   var mousePosition = false
   var mouseCanvasPosition = false
-  canvasLocation = {x: 0, y: 0}
+  var canvasLocation = {x: 0, y: 0}
+  var mouseDown = false
+
+
 
   $(window).on('resize', function() {
     canvas.width = innerWidth
@@ -54,10 +90,20 @@ $(function() {
 
       var points = applyCanvasTranslate(drawPoints)
 
-      //if (drawPoints[0] < innerWidth && drawPoints[1] < innerHeight) {
-        ctx.fillStyle = '#000000'
+      // dont draw if not on screen
+      var thingPoint = [thing[0] * 20, thing[1] * 20]
+
+      var screenBox = [
+        -canvasLocation.x -20,
+        -canvasLocation.y -20,
+        -canvasLocation.x + innerWidth,
+        -canvasLocation.y + innerHeight
+      ]
+
+      if (pointInBox(thingPoint, screenBox)) {
+        ctx.fillStyle = rgbColor
         ctx.fillRect(points[0], points[1], 20, 20)
-      //}
+      }
 
     }
   }
@@ -99,7 +145,7 @@ $(function() {
   }
 
   function moveCanvas(direction) {
-    var step = 2
+    var step = 4
     if (direction == 'right') {
       canvasLocation.x -= step
       $('html').css('background-position', canvasLocation.x + 'px ' + canvasLocation.y + 'px')
@@ -128,12 +174,36 @@ $(function() {
 
   function applyNegativeCanvasTranslate(array) {
     return [
-    array[0] - canvasLocation.x,
-    array[1] - canvasLocation.y
+      array[0] - canvasLocation.x,
+      array[1] - canvasLocation.y
     ]
   }
 
-  function log(msg) {
-    $('.log').html(msg)
+  $('.colorClicker').on('click', function() {
+    $('.colorWindow').toggleClass('hide')
+  })
+
+  function pointInBox(point, box) {
+    var pointX = point[0]
+    var pointY = point[1]
+    var boxX1 = box[0]
+    var boxY1 = box[1]
+    var boxX2 = box[2]
+    var boxY2 = box[3]
+
+    if (pointX > boxX1 && pointX < boxX2 && pointY > boxY1 && pointY < boxY2) {
+      return true
+    }
+    else {
+      return false
+    }
+
   }
+
+  $(window).on('mousedown', function() {
+    mousedown = true
+  })
+  $(window).on('mouseup', function() {
+    mousedown = false
+  })
 })
