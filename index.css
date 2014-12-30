@@ -8,7 +8,7 @@ canvas {
 
 html {
   cursor: none;
-  background-image: url(background.png);
+  background-image: url(background.webp);
 }
 
 .bottomBar {
@@ -19,7 +19,7 @@ html {
   cursor: default;
   background-color: rgba(0, 0, 0, .5);
   box-sizing: border-box;
-  cursor: url(cursor.png) 8 8, default;
+  cursor: url(cursor.webp) 8 8, default;
   display: flex;
   align-items: center;
 }

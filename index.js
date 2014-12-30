@@ -4,12 +4,18 @@ $(function() {
   var rgbColor = 'rgb(0,0,0)'
 
   var cursor = new Image()
-  cursor.src = 'cursor.png'
+  cursor.src = 'cursor.webp'
   var colorWheel = new Image()
 
   $(colorWheel).on('load', function() {
-    var colorWheelContext = $('.color-wheel')[0].getContext('2d')
+    colorWheelContext = $('.color-wheel')[0].getContext('2d')
     colorWheelContext.drawImage(colorWheel, 0, 0, 150, 150)
+
+    colorWheelContext.globalAlpha = .15
+    colorWheelContext.fillStyle = '#000000'
+    colorWheelContext.fillRect(0, 0, 150, 150)
+    colorWheelContext.globalAlpha = 1
+
     $('.color-wheel').on('click', getRgb)
     $('.color-wheel').on('mousemove', function(e) {
       if (mousedown) {
@@ -26,15 +32,34 @@ $(function() {
     }
   })
 
-  colorWheel.src = 'color-wheel.png'
+  colorWheel.src = 'color-wheel.webp'
   var b2w = new Image()
 
   $(b2w).on('load', function() {
     var b2wContext = $('.b2w')[0].getContext('2d')
     b2wContext.drawImage(b2w, 0, 0)
+
+    $('.b2w').on('click', darken)
+    $('.b2w').on('mousemove', function(e) {
+      if (mousedown) {
+        darken(e)
+      }
+    })
+
+    function darken(e) {
+      var x = e.pageX - $('.b2w').offset().left
+      var y = e.pageY - $('.b2w').offset().top
+      var rgb = b2wContext.getImageData(x, y, 1, 1).data
+      colorWheelContext.drawImage(colorWheel, 0, 0, 150, 150)
+      var opacity = 1 - (rgb[0] / 255)
+      colorWheelContext.globalAlpha = opacity
+      colorWheelContext.fillStyle = '#000000'
+      colorWheelContext.fillRect(0, 0, 150, 150)
+      colorWheelContext.globalAlpha = 1
+    }
   })
 
-  b2w.src = 'b2w.png'
+  b2w.src = 'b2w.webp'
 
   var mousePosition = false
   var mouseCanvasPosition = false
